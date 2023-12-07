@@ -3,7 +3,7 @@ This GitHub mainly uses python to implement the SOC sorting algorithm of the pap
 
 This Github is mainly maintained by Chen Yingjie and Peng Chu.  
 
-Yingjie Chen  
-Nanjing Tech University 
-School of Computer and Information Engineering (School of Artificial Intelligence)  
+Yingjie Chen   
+Nanjing Tech University   
+Computer and Information Engineering Academy(Artificial Intelligence Academy)   
 Student  
