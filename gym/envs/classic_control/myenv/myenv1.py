@@ -9,7 +9,7 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-class MyEnv(gym.Env):
+class MyEnv1(gym.Env):
     
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -99,7 +99,7 @@ class MyEnv(gym.Env):
             standard_deviation = np.std(SOC_M)
             #print("standard_deviation",standard_deviation)
             #print(SOC_M)
-            reward=np.std(SOC_M,axis=0)
+            reward=-1000*np.std(SOC_M,axis=0)
 
         return np.array(self.state), reward, done, {}
 

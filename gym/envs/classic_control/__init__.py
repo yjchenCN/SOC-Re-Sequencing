@@ -5,5 +5,5 @@ from gym.envs.classic_control.pendulum import PendulumEnv
 from gym.envs.classic_control.acrobot import AcrobotEnv
 #MyEnv
 from gym.envs.classic_control.myenv.myenv import MyEnv
-
+from gym.envs.classic_control.myenv.myenv1 import MyEnv1
 
