@@ -52,12 +52,36 @@ class MyEnv2(gym.Env):
             indices = np.where(self.form == indEV + 1)[0]
 
             # 检查索引是否在合理范围内
-            if indices and 0 <= int(indices) < len(self.Delta) and 0 <= int(self.col) - 1 < len(self.Delta[0]):
+            '''if indices and 0 <= int(indices) < len(self.Delta) and 0 <= int(self.col) - 1 < len(self.Delta[0]):
                 Y = self.Delta[int(indices)][int(self.col) - 1]
             else:
-                # 如果索引越界，将 Y 的所有值设置为 0.1
-                #Y = np.full_like(self.Delta[0], 0.1)  # 或者选择其他你需要的值
-                Y = self.Delta[-1]
+                # 如果索引越界，将 Y 的所有值设置为最后排列顺序车辆所对应的self.Delta中的向量
+                order_indices = np.argsort(self.form)  # 获取当前排列顺序下车辆的顺序
+                last_row_values = self.Delta[-1]  # 使用最后一行的值作为备选
+                # 根据车辆的顺序提取相应的值
+                Y = last_row_values[order_indices]
+                count = 0
+                if(count % 100 == 0):
+                    print(Y)
+                    count = count + 1'''
+            
+            
+            # 检查索引是否在合理范围内
+            if indices and 0 <= int(indices) < len(self.Delta) and 0 <= int(self.col) - 1 < len(self.Delta[0]):
+                Y = self.Delta[int(indices)][int(self.col) - 1]
+            elif self.col <= 5:
+                # 如果索引越界且在前五次位置排序，随机选择一个向量赋值给 Y
+                random_index = np.random.randint(0, len(self.Delta))
+                Y = self.Delta[random_index]
+            else:
+                # 在第五次排序后，一直使用第五次排序的 Y 值
+                Y = self.Delta[:, 4]
+
+                '''count = 0
+                if(count % 100 == 0):
+                    print(Y)
+                    count = count + 1'''
+
 
             SC[indEV % 4] = np.squeeze(np.sum(X) - np.sum(Y))
 
