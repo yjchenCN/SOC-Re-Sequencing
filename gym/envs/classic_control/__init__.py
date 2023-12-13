@@ -6,4 +6,4 @@ from gym.envs.classic_control.acrobot import AcrobotEnv
 #MyEnv
 from gym.envs.classic_control.myenv.myenv import MyEnv
 from gym.envs.classic_control.myenv.myenv1 import MyEnv1
-
+from gym.envs.classic_control.myenv.myenv2 import MyEnv2

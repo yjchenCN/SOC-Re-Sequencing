@@ -16,7 +16,7 @@ class MyEnv(gym.Env):
 
     def __init__(self):
         self.N = 4
-        self.M = 5
+        self.M = 10
         self.forms = list(itertools.permutations(range(self.N, 0, -1)))  # 4辆车的全排列 所有可能
         self.formaction = np.array(self.forms).T  # 写成矩阵的形式
         self.numAct = self.formaction.shape[1]  # 转置矩阵的列数，即N的全排列的所有可能数
@@ -36,7 +36,7 @@ class MyEnv(gym.Env):
         self.observation_space = spaces.Box(low=np.array([0.0, 0.0, 0.0, 0.0, 0], dtype=np.float32), high=np.array([1.0, 1.0, 1.0, 1.0, 10], dtype=np.float32), shape=(5,))
         self.seed()
         self.viewer = None
-        self.state = None
+        self.state = None   
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
