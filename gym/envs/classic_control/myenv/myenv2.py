@@ -27,6 +27,7 @@ class MyEnv2(gym.Env):
         self.col = None  # col为当下处于第几个重排序地点
         self.Action = random.choice(range(self.formaction.shape[1]))  # 选择一个随机的列索引(随机选择一个动作)
         self.form = None
+        self.fifth_order_vector = None
         self.Delta = np.array([[0.1302, 0.1334, 0.2522, 0.1868, 0.0787],
                                [0.1224, 0.1255, 0.2372, 0.1756, 0.0741],
                                [0.1170, 0.1199, 0.2266, 0.1678, 0.0708],
@@ -43,49 +44,39 @@ class MyEnv2(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+    
+
+
     # 未到达终点前SOC的计算函数
     def clcSM(self):
         SM = self.SOC.copy()
         SC = np.zeros(4)
+        
         for indEV in range(self.N):
             X = SM[indEV]
             indices = np.where(self.form == indEV + 1)[0]
 
-            # 检查索引是否在合理范围内
-            '''if indices and 0 <= int(indices) < len(self.Delta) and 0 <= int(self.col) - 1 < len(self.Delta[0]):
-                Y = self.Delta[int(indices)][int(self.col) - 1]
-            else:
-                # 如果索引越界，将 Y 的所有值设置为最后排列顺序车辆所对应的self.Delta中的向量
-                order_indices = np.argsort(self.form)  # 获取当前排列顺序下车辆的顺序
-                last_row_values = self.Delta[-1]  # 使用最后一行的值作为备选
-                # 根据车辆的顺序提取相应的值
-                Y = last_row_values[order_indices]
-                count = 0
-                if(count % 100 == 0):
-                    print(Y)
-                    count = count + 1'''
-            
-            
-            # 检查索引是否在合理范围内
             if indices and 0 <= int(indices) < len(self.Delta) and 0 <= int(self.col) - 1 < len(self.Delta[0]):
                 Y = self.Delta[int(indices)][int(self.col) - 1]
             elif self.col <= 5:
-                # 如果索引越界且在前五次位置排序，随机选择一个向量赋值给 Y
-                random_index = np.random.randint(0, len(self.Delta))
-                Y = self.Delta[random_index]
+                # 如果索引越界且在前五次位置排序，按照前一次的SOC情况排序
+                order_indices = np.argsort(self.SOC) + 1
+                Y = self.Delta[:, order_indices[-1] - 1]
             else:
                 # 在第五次排序后，一直使用第五次排序的 Y 值
-                Y = self.Delta[:, 4]
+                if self.fifth_order_vector is None:
+                    # 如果第五次排序的向量尚未记录，则记录
+                    sorted_indices = np.argsort(self.SOC) + 1
+                    self.fifth_order_vector = self.Delta[:, sorted_indices[-1] - 1]
 
-                '''count = 0
-                if(count % 100 == 0):
-                    print(Y)
-                    count = count + 1'''
-
+                Y = self.fifth_order_vector
 
             SC[indEV % 4] = np.squeeze(np.sum(X) - np.sum(Y))
-
+        
         return SC
+
+
+
 
     # 最后一个位置进行SOC排序
     def socOrderForm(self):
@@ -127,7 +118,7 @@ class MyEnv2(gym.Env):
         return np.array(self.state), reward, done, {}
 
     def reset(self):
-        self.state = np.array([1, 1, 1, 1, 7])  # 修改为初始SOC为1，可重排序地点为10
+        self.state = np.array([1, 1, 1, 1, 7])  # 修改为初始SOC为1，可重排序地点为7
         return np.array(self.state)
 
     def close(self):
