@@ -8,7 +8,7 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-class MyEnv2(gym.Env):
+class MyEnv3(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
@@ -83,6 +83,17 @@ class MyEnv2(gym.Env):
         sorted_indices = np.argsort(self.SOC) + 1
         sorted_SOC = self.SOC[sorted_indices - 1]
         return sorted_SOC
+    
+
+    def calculate_efficiency(state, new_state):
+        # 计算车辆之间的位置差
+        position_diff = np.abs(new_state[:4] - state[:4])
+
+        # 计算编队紧密度指标，利用位置差的均值
+        efficiency = np.mean(position_diff)
+
+        return efficiency
+
 
     def step(self, action):
         # 检查动作的有效性
@@ -96,6 +107,14 @@ class MyEnv2(gym.Env):
         self.remRsq = self.remRsq - 1
         self.state = np.array([])
         self.state = np.concatenate((self.SOC, [self.remRsq]))
+
+        # 计算位置变化次数的惩罚
+        position_changes = np.sum(np.abs(self.state[:4] - self.form))  # 使用self.form表示新状态
+        position_change_penalty = -position_changes  # 负惩罚，越少位置变化越好
+
+        # 计算燃油节省效率奖励，例如，编队紧密度
+        fuel_efficiency_reward = self.calculate_efficiency(self.state, self.form)
+
         done = bool(self.remRsq == 1 or any(self.SOC <= 0))  # 终止条件修改为SOC为零或任一SOC小于等于零
         if not done:
             reward = 0.0
@@ -108,10 +127,11 @@ class MyEnv2(gym.Env):
                 distances = np.abs(self.SOC)
                 
                 # 计算惩罚，距离越远惩罚越大
-                penalty = np.sum(distances)
+                penalty = -np.sum(distances)
                 
                 # 设置最终奖励
-                reward = standard_deviation-penalty
+                reward = standard_deviation + penalty + position_change_penalty + fuel_efficiency_reward
+                
             else:
                 # 如果所有车的SOC都大于零，奖励为SOC的标准差
                 reward = standard_deviation

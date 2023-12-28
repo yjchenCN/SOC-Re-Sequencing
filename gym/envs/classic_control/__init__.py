@@ -7,3 +7,5 @@ from gym.envs.classic_control.acrobot import AcrobotEnv
 from gym.envs.classic_control.myenv.myenv import MyEnv
 from gym.envs.classic_control.myenv.myenv1 import MyEnv1
 from gym.envs.classic_control.myenv.myenv2 import MyEnv2
+from gym.envs.classic_control.myenv.myenv3 import MyEnv3
+from gym.envs.classic_control.myenv.myenvMA import MultiAgentEnv
